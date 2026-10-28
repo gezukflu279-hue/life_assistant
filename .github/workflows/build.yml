@@ -1,17 +1,346 @@
-name: Build Flutter APK
+import 'package:flutter/material.dart';
 
-on:
-  push:
-    branches: [ main ]
+void main() {
+  runApp(const LifeAssistantApp());
+}
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.x'
-          channel: 'stable'
-      - run: flutter pub get
-      - run: flutter build apk --release
+class LifeAssistantApp extends StatelessWidget {
+  const LifeAssistantApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'All-in-One Life Assistant',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.indigo,
+        useMaterial3: true,
+      ),
+      home: const MainScreen(),
+    );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _currentIndex = 0;
+
+  // የገጾቹ ዝርዝር
+  final List<Widget> _pages = [
+    const HabitsScreen(),
+    const FinanceScreen(),
+    const AiAssistantScreen(),
+    const SettingsScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        selectedItemColor: Colors.indigo,
+        unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.check_circle_outline),
+            label: 'ልምዶች',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_balance_wallet_outlined),
+            label: 'ፋይናንስ',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.auto_awesome),
+            label: 'AI ረዳት',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings_outlined),
+            label: 'ቅንብሮች',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// 1. የልምዶች እና ጤና ገጽ (Habits & Health Screen)
+class HabitsScreen extends StatefulWidget {
+  const HabitsScreen({super.key});
+
+  @override
+  State<HabitsScreen> createState() => _HabitsScreenState();
+}
+
+class _HabitsScreenState extends State<HabitsScreen> {
+  final List<Map<String, dynamic>> _habits = [
+    {'name': 'ማለዳ 30 ደቂቃ ማንበብ', 'isDone': false},
+    {'name': '2 ሊትር ውኃ መጠጣት', 'isDone': true},
+    {'name': '1 ሰዓት የአካል ብቃት እንቅስቃሴ', 'isDone': false},
+  ];
+
+  final TextEditingController _habitController = TextEditingController();
+
+  void _addHabit() {
+    if (_habitController.text.isNotEmpty) {
+      setState(() {
+        _habits.add({'name': _habitController.text, 'isDone': false});
+        _habitController.clear();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('የልምድ እና ጤና መከታተያ')),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _habitController,
+                    decoration: const InputDecoration(
+                      labelText: 'አዲስ ልምድ ይጨምሩ...',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: _addHabit,
+                  child: const Text('ጨምር'),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _habits.length,
+              itemBuilder: (context, index) {
+                return CheckboxListTile(
+                  title: Text(_habits[index]['name']),
+                  value: _habits[index]['isDone'],
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _habits[index]['isDone'] = value ?? false;
+                    });
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// 2. የፋይናንስ ገጽ (Finance Screen)
+class FinanceScreen extends StatefulWidget {
+  const FinanceScreen({super.key});
+
+  @override
+  State<FinanceScreen> createState() => _FinanceScreenState();
+}
+
+class _FinanceScreenState extends State<FinanceScreen> {
+  final List<Map<String, String>> _transactions = [
+    {'title': 'የወር ደመወዝ', 'amount': '+15,000 ብር', 'type': 'income'},
+    {'title': 'የምግብ ግብይት', 'amount': '-2,500 ብር', 'type': 'expense'},
+    {'title': 'የመጓጓዣ 费用', 'amount': '-500 ብር', 'type': 'expense'},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('የፋይናንስ አስተዳደር')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.indigo.shade50,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('ቀሪ ሂሳብ:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text('12,000 ብር', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text('የቅርብ ጊዜ እንቅስቃሴዎች', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _transactions.length,
+                itemBuilder: (context, index) {
+                  final tx = _transactions[index];
+                  final isIncome = tx['type'] == 'income';
+                  return Card(
+                    child: ListTile(
+                      leading: Icon(
+                        isIncome ? Icons.arrow_downward : Icons.arrow_upward,
+                        color: isIncome ? Colors.green : Colors.red,
+                      ),
+                      title: Text(tx['title']!),
+                      trailing: Text(
+                        tx['amount']!,
+                        style: TextStyle(
+                          color: isIncome ? Colors.green : Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// 3. AI ረዳት ገጽ (AI Assistant Screen)
+class AiAssistantScreen extends StatefulWidget {
+  const AiAssistantScreen({super.key});
+
+  @override
+  State<AiAssistantScreen> createState() => _AiAssistantScreenState();
+}
+
+class _AiAssistantScreenState extends State<AiAssistantScreen> {
+  final List<Map<String, String>> _messages = [
+    {'sender': 'ai', 'text': 'ሰላም! እኔ የእርስዎ AI የህይወት ረዳት ነኝ። ዛሬ እንዴት ልረዳዎ እችላለሁ?'}
+  ];
+  final TextEditingController _msgController = TextEditingController();
+
+  void _sendMessage() {
+    if (_msgController.text.isNotEmpty) {
+      setState(() {
+        _messages.add({'sender': 'user', 'text': _msgController.text});
+        String userQuery = _msgController.text;
+        _msgController.clear();
+        
+        // የማስመሰያ (Mock) ምላሽ
+        _messages.add({'sender': 'ai', 'text': 'ጥሩ ሀሳብ ነው! ስለ "$userQuery" ተጨማሪ ዝርዝር በቅርቡ እንሰራለን።'});
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('AI ረዳት (Assistant)')),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                final msg = _messages[index];
+                final isUser = msg['sender'] == 'user';
+                return Align(
+                  alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isUser ? Colors.indigo.shade100 : Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(msg['text']!),
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _msgController,
+                    decoration: const InputDecoration(
+                      hintText: 'መልእክት ይጻፉ...',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.send, color: Colors.indigo),
+                  onPressed: _sendMessage,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// 4. የቅንብሮች ገጽ (Settings Page)
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('ቅንብሮች (Settings)')),
+      body: ListView(
+        children: [
+          SwitchListTile(
+            title: const Text('ጨለማ ገጽታ (Dark Mode)'),
+            value: false,
+            onChanged: (bool value) {},
+          ),
+          SwitchListTile(
+            title: const Text('ማስታወቂያዎች (Notifications)'),
+            value: true,
+            onChanged: (bool value) {},
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.language),
+            title: const Text('ቋንቋ (Language)'),
+            subtitle: const Text('አማርኛ'),
+            onTap: () {},
+          ),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: const Text('ስለ አፕሊኬሽኑ'),
+            subtitle: const Text('ဗርሽን 1.0.0'),
+            onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+}
