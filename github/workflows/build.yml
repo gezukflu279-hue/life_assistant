@@ -1,10 +1,185 @@
-name: Build
-on: [push]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-      - run: flutter pub get
-      - run: flutter build apk --release
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const LifeAssistantApp());
+}
+
+class LifeAssistantApp extends StatelessWidget {
+  const LifeAssistantApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'All-in-One Life Assistant',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.indigo,
+        useMaterial3: true,
+      ),
+      home: const MainHomeScreen(),
+    );
+  }
+}
+
+class MainHomeScreen extends StatefulWidget {
+  const MainHomeScreen({super.key});
+
+  @override
+  State<MainHomeScreen> createState() => _MainHomeScreenState();
+}
+
+class _MainHomeScreenState extends State<MainHomeScreen> {
+  int _currentIndex = 0;
+
+  // የገጾቹ ዝርዝር (ከሲቲንግ ጋር)
+  final List<Widget> _pages = [
+    const HabitsScreen(),
+    const FinanceScreen(),
+    const AiAssistantScreen(),
+    const SettingsScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.indigo,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.check_circle_outline),
+            label: 'ልምዶች',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_balance_wallet_outlined),
+            label: 'ፋይናንስ',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.auto_awesome),
+            label: 'AI ረዳት',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings_outlined),
+            label: 'ማስተካከያ',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// 1. የልምድ እና ጤና መከታተያ ገጽ
+class HabitsScreen extends StatelessWidget {
+  const HabitsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('የልምድ እና ጤና መከታተያ'),
+        centerTitle: true,
+      ),
+      body: const Center(
+        child: Text(
+          'የልምድ እና ጤና መከታተያ ገጽ[span_2](start_span)[span_2](end_span)',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+}
+
+// 2. የፋይናንስ አስተዳደር ገጽ
+class FinanceScreen extends StatelessWidget {
+  const FinanceScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('የፋይናንስ አስተዳደር'),
+        centerTitle: true,
+      ),
+      body: const Center(
+        child: Text(
+          'የገቢ እና ወጪ አስተዳደር ገጽ[span_3](start_span)[span_3](end_span)',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+}
+
+// 3. AI ረዳት ገጽ
+class AiAssistantScreen extends StatelessWidget {
+  const AiAssistantScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('AI ረዳት'),
+        centerTitle: true,
+      ),
+      body: const Center(
+        child: Text(
+          'ከእርስዎ AI ረዳት ጋር የሚደረግ ውይይት[span_4](start_span)[span_4](end_span)',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+}
+
+// 4. የማስተካከያ (Settings) ገጽ
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ማስተካከያዎች (Settings)'),
+        centerTitle: true,
+      ),
+      body: ListView(
+        children: const [
+          ListTile(
+            leading: Icon(Icons.notifications_active, color: Colors.indigo),
+            title: Text('ማሳሰቢያዎች (Notifications)'),
+            subtitle: Text('ዕለታዊ ማስታወሻዎችን ያብሩ ወይም ያጥፉ'),
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.dark_mode, color: Colors.indigo),
+            title: Text('የጨለማ ገጽታ (Dark Mode)'),
+            subtitle: Text('የመተግበሪያውን ገጽታ ይቀይሩ'),
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.language, color: Colors.indigo),
+            title: Text('ቋንቋ (Language)'),
+            subtitle: Text('አማርኛ'),
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.info_outline, color: Colors.indigo),
+            title: Text('ስለ አፑ (About App)'),
+            subtitle: Text('All-in-One Life Assistant v1.0.0[span_5](start_span)[span_5](end_span)'),
+          ),
+        ],
+      ),
+    );
+  }
+}
